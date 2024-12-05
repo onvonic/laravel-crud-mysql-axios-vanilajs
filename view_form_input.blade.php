@@ -105,6 +105,31 @@
             </div>
         </div>
     </div>
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    {{-- VARIABLE --}}
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    <script>
+        // Variabel untuk filter/search
+        const sySearch = document.getElementById('short_by_search');
+        const syLimit = document.getElementById('short_by_limit');
+        const syModule = document.getElementById('short_by_module');
+        const syAction = document.getElementById('short_by_action');
+
+        // Variabel untuk form edit
+        const edId = document.getElementById('edit_id');
+        const edModuleId = document.getElementById('edit_module_id');
+        const edActionName = document.getElementById('edit_action_name');
+
+        // Variabel untuk button
+        const buttonUpdate = document.getElementById('button_update');
+        const buttonUpdateSend = document.getElementById('button_update_send');
+        // Variabel untuk modal
+        const componentModalFormEdit = document.getElementById('component_modal_form_edit');
+        // Variabel table data
+        const dataTable = document.getElementById('data_table');
+
+        const getShowModalEditButton = (target) => target.closest('.btn_show_component_modal_form_edit');
+    </script>
     {{-- ========================================================================================================================================================= --}}
     {{-- ALERT --}}
     {{-- ========================================================================================================================================================= --}}
@@ -142,31 +167,6 @@
                 'error'
             );
         }
-    </script>
-    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
-    {{-- VARIABLE --}}
-    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
-    <script>
-        // Variabel untuk filter/search
-        const sySearch = document.getElementById('short_by_search');
-        const syLimit = document.getElementById('short_by_limit');
-        const syModule = document.getElementById('short_by_module');
-        const syAction = document.getElementById('short_by_action');
-
-        // Variabel untuk form edit
-        const edId = document.getElementById('edit_id');
-        const edModuleId = document.getElementById('edit_module_id');
-        const edActionName = document.getElementById('edit_action_name');
-
-        // Variabel untuk button
-        const buttonUpdate = document.getElementById('button_update');
-        const buttonUpdateSend = document.getElementById('button_update_send');
-        // Variabel untuk modal
-        const componentModalFormEdit = document.getElementById('component_modal_form_edit');
-        // Variabel table data
-        const dataTable = document.getElementById('data_table');
-
-        const getShowModalEditButton = (target) => target.closest('.btn_show_component_modal_form_edit');
     </script>
     {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
     {{-- SET DATA --}}
