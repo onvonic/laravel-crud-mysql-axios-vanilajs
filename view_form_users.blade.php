@@ -47,10 +47,10 @@
                                     <th class="ps-4">Users</th>
                                     <th>Email</th>
                                     <th>Roles</th>
-                                    <th>Last Login</th>
                                     <th>Status</th>
-                                    <th>Created At</th>
-                                    <th>Update At</th>
+                                    <th>Last Login</th>
+                                    <th>Desc Login</th>
+                                    <th>Desc</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -294,10 +294,16 @@
                         <td class="ps-4">${item.name}</td>
                         <td>${item.email}</td>
                         <td>${item.roles?item.roles:''}</td>
-                        <td>${item.status?item.status:''}</td>
+                        <td>
+                            <div class="form-check form-switch" dir="ltr">
+                                <input type="checkbox" class="form-check-input status_account" data-id="${item.id}" data-status="${item.status}" ${item.attributes_status}>
+                                <label class="form-check-label">${item.status}</label>
+                            </div>    
+                        </td>
                         <td>${item.last_login?item.last_login:''}</td>
-                        <td>${item.created_at?item.created_at:''}</td>
-                        <td>${item.updated_at?item.updated_at:''}</td>
+                        <td>${item.last_login_relative?item.last_login_relative:''}</td>
+                        <td>${item.password_updated?item.password_updated:''}</td>
+
                         <td>
                             <a href="#" data-id="${item.id}" class="btn_show_component_modal_form_edit"><i class="fa-regular fa-pen-to-square text-success"></i></a>
                             <a href="#" data-id="${item.id}" class="btn_delete"><i class="fa-solid fa-trash text-danger"></i></a>
@@ -506,54 +512,52 @@
     });
 </script>
 {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
-{{-- UPDATE STATUS USERS --}}
+{{-- HANDLE STATUS ACTIVE/NONACTIVE USER --}}
 {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
 <script>
-    document.addEventListener('click', function(event) {
-        if (event.target.type === 'checkbox') {
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('change', async function(event) {
+            if (!event.target.matches('.status_account')) return;
             const checkbox = event.target;
-            const id = checkbox.value;
-            const status = checkbox.checked ? "active" : "nonactive";
-            const statusValueElement = document.getElementById('status_value' + id);
-            if (statusValueElement) {
-                statusValueElement.textContent = status;
+            const id = checkbox.dataset.id;
+            const newStatus = checkbox.checked ? 'active' : 'nonactive';
+
+            const responseData = await axios.post("{{ route('app.users.update.status') }}", {
+                id: id,
+                status: newStatus
+            });
+            let response = responseData.data;
+            if (response.status === true) {
+                // refresh fetchData
+                const syVSearch = sySearch.value;
+                const syVLimit = syLimit.value;
+                const syVRoles = syRoles.value;
+                const syVStatus = syStatus.value;
+                fetchData(syVSearch, syVLimit, syVStatus, syVRoles);
+                alertResponseSuccess(response.message);
+            } else {
+                alertResponseError(response.message);
             }
-            fetch("{{ route('app.users.update.status') }}", {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        id: id,
-                        status: status
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    toastr.options = {
-                        "closeButton": false,
-                        "debug": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toastr-bottom-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "3000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                    };
-                    toastr.success(data.message);
-                })
-                .catch(error => {
-                    console.error('Error updating status:', error);
-                });
-        }
+        });
     });
+</script>
+{{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+{{-- TOGGLE PASSWORD VISIBILITY --}}
+{{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+<script>
+    function togglePasswordVisibility(buttonId, inputSelector) {
+        document.getElementById(buttonId).addEventListener('click', function() {
+            const inputField = this.parentElement.querySelector('input');
+            if (inputField) {
+                if (inputField.type === 'password') {
+                    inputField.type = 'text';
+                } else {
+                    inputField.type = 'password';
+                }
+            }
+        });
+    }
+    togglePasswordVisibility('show_hidden_password', '#input_password');
+    togglePasswordVisibility('edit_show_hidden_password', '#edit_password');
 </script>
 @endpush
