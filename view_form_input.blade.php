@@ -4,90 +4,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FORM INPUT</title>
+    <title>INPUT</title>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
 <body>
-    <form id="invoice_form">
-        <!-- Customer Information Section -->
-        <div>
-            <h2>Customer Information</h2>
-            <div>
-                <label for="inv_cus_name">Customer Name:</label>
-                <input type="text" id="inv_cus_name">
-            </div>
-
-            <div>
-                <label for="inv_cus_email">Customer Email:</label>
-                <input type="email" id="inv_cus_email">
-            </div>
-
-            <div>
-                <label for="inv_cus_phone">Customer Phone:</label>
-                <input type="tel" id="inv_cus_phone">
-            </div>
-            <div>
-                <label for="inv_cus_phone">Files:</label>
-                <input type="file" id="inv_files">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-4 ">
+            <div id="kt_app_toolbar_container" class="app-container  container-fluid d-flex flex-stack ">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold fs-3 mb-1">DATA USERS PERMISSION</span><br>
+                    <span class="text-muted mt-1 fw-semibold fs-7">Create, edit, and manage users permission action data on this page </span>
+                </h3>
             </div>
         </div>
-        <!-- Invoice Dates Section -->
-        <div>
-            <h2>Invoice Dates</h2>
-            <div>
-                <label for="inv_date">Invoice Date:</label>
-                <input type="date" id="inv_date">
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card mb-5 mb-xl-8">
+                    <div
+                        style="display: flex;gap: 5px; align-items: center;justify-content: space-between;padding: 5px 10px; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select class="form-control form-control-xs"
+                                style="font-size: 0.9rem; padding:0.1rem 1rem; width: auto;" id="short_by_limit">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="75">75</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <select class="form-control form-control-xs" style="font-size: 0.9rem; padding:0.1rem 1rem; width: auto;" id="short_by_module"></select>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <select class="form-control form-control-xs" style="font-size: 0.9rem; padding:0.1rem 1rem; width: auto;" id="short_by_action"></select>
+                            </div>
+                            <input type="text" class="form-control form-control-xs" id="short_by_search" placeholder="search..." />
+                            <button id="btn_show_component_modal_form_input" class="btn btn-primary btn-xs" style="width: 100%"><i class="las la-plus fs-1"></i> ADD MOD ACTION</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-row-dashed align-middle" id="datatable">
+                                <thead class="thead-light"> 
+                                    <tr class="fw-bold bg-light">
+                                        <th class="ps-4">ID</th>
+                                        <th>Modules</th>
+                                        <th>Action</th>
+                                        <th>Created at</th>
+                                        <th>Updated at</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data_table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div>
-                <label for="inv_files">Due Date:</label>
-                <input type="date" id="inv_date_jatuh_tempo">
+        </div>
+    </div>
+    <div class="modal fade" id="component_modal_form_edit" tabindex="-1" role="dialog"
+        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myLargeModalLabel">UPDATE MODULES ACTION</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-1">
+                            <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">Module name</label>
+                            <div class="col-sm-9">
+                                <input type="hidden" class="form-control form-control-sm" id="edit_id" required />
+                                <select class="form-control form-control-sm" id="edit_module_id"></select>
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">module
+                                action</label>
+                            <div class="col-sm-9">
+                                <select class="form-control form-control-sm" id="edit_action_name"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Close</a>
+                        <button type="button" id="button_update" class="btn btn-primary ">Save changes</button>
+                        <button type="button" id="button_update_send" class="btn btn-sm btn-primary" style="display: none">
+                            <span class="spinner-border" style="--bs-spinner-width: 10px; --bs-spinner-height: 10px;"
+                                role="status"></span>
+                            <span>loading ...</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-        <!-- Invoice Items Section -->
-        <div>
-            <h2>Invoice Items</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Item Name</th>
-                        <th>Description</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody id="item_invoice">
-                    <!-- First Row -->
-                    <tr>
-                        <td><input type="text" class="inv_item_name"></td>
-                        <td><input type="text" class="inv_desc"></td>
-                        <td><input type="number" class="inv_qty"></td>
-                        <td><input type="number" class="inv_price"></td>
-                        <td><input type="number" class="inv_total"></td>
-                    </tr>
-                    <!-- Second Row -->
-                    <tr>
-                        <td><input type="text" class="inv_item_name"></td>
-                        <td><input type="text" class="inv_desc"></td>
-                        <td><input type="number" class="inv_qty"></td>
-                        <td><input type="number" class="inv_price"></td>
-                        <td><input type="number" class="inv_total"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <!-- Submit Buttons -->
-        <div>
-            <button type="button" id="submit_invoice">Create Invoice</button>
-            <button type="button" id="submit_invoice_send" style="display: none;">Processing...</button>
-        </div>
-    </form>
-    <!-- =========================================================================================================================================================  -->
-    <!-- ALERT  -->
-    <!-- =========================================================================================================================================================  -->
-    <script src="{{ asset('assets/panel/plugins/custom/sweetalert/sweetalert.set.js') }}"></script>
+    </div>
+    {{-- ========================================================================================================================================================= --}}
+    {{-- ALERT --}}
+    {{-- ========================================================================================================================================================= --}}
     <script>
         // FUNGSI ALERT SUCCESS
         function alertResponseSuccess(message) {
@@ -123,68 +143,270 @@
             );
         }
     </script>
-    <!-- =========================================================================================================================================================  -->
-    <!-- CREAT INVOICE  -->
-    <!-- =========================================================================================================================================================  -->
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    {{-- VARIABLE --}}
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
     <script>
-        // Deklarasi elements
-        const submitInvoice = document.getElementById('submit_invoice');
-        const submitInvoiceSend = document.getElementById('submit_invoice_send');
-        const inCusName = document.getElementById('inv_cus_name');
-        const inCusEmail = document.getElementById('inv_cus_email');
-        const inCusPhone = document.getElementById('inv_cus_phone');
-        const inDate = document.getElementById('inv_date');
-        const inDateJatuhTempo = document.getElementById('inv_date_jatuh_tempo');
-        const inFiles = document.getElementById('inv_files');
-        // Function to collect row data
-        const collectRowData = () => {
-            const rows = document.querySelectorAll('#item_invoice tr');
-            const rowData = [];
-            rows.forEach(row => {
-                const quantity = row.querySelector('.inv_qty').value.replace(/,/g, '');
-                const price = row.querySelector('.inv_price').value.replace(/,/g, '');
-                const total = row.querySelector('.inv_total').value.replace(/,/g, '');
-                rowData.push({
-                    item_name: row.querySelector('.inv_item_name').value,
-                    description: row.querySelector('.inv_desc').value,
-                    quantity: parseFloat(quantity),
-                    price: parseFloat(price),
-                    total: parseFloat(total)
+        // Variabel untuk filter/search
+        const sySearch = document.getElementById('short_by_search');
+        const syLimit = document.getElementById('short_by_limit');
+        const syModule = document.getElementById('short_by_module');
+        const syAction = document.getElementById('short_by_action');
+
+        // Variabel untuk form edit
+        const edId = document.getElementById('edit_id');
+        const edModuleId = document.getElementById('edit_module_id');
+        const edActionName = document.getElementById('edit_action_name');
+
+        // Variabel untuk button
+        const buttonUpdate = document.getElementById('button_update');
+        const buttonUpdateSend = document.getElementById('button_update_send');
+        // Variabel untuk modal
+        const componentModalFormEdit = document.getElementById('component_modal_form_edit');
+        // Variabel table data
+        const dataTable = document.getElementById('data_table');
+
+        const getShowModalEditButton = (target) => target.closest('.btn_show_component_modal_form_edit');
+    </script>
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    {{-- SET DATA --}}
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    <script>
+        // Data action_name 
+        const actionName = [
+            { value: 'view', label: 'view'},
+            { value: 'insert', label: 'insert'},
+            { value: 'delete', label: 'delete'},
+            { value: 'update', label: 'update'},
+            { value: 'verifikasi', label: 'verifikasi'},
+            { value: 'validasi', label: 'validasi'}
+        ];
+        // Handle input_action_name select
+        function setInputActionName() {
+            if (inActionName) {
+                inActionName.innerHTML = '<option value="">Select Action</option>';
+                actionName.forEach(role => {
+                    inActionName.innerHTML += `<option value="${role.value}">${role.label}</option>`;
                 });
-            });
-            return rowData;
-        };
-        // Event listener untuk submit invoice
-        submitInvoice.addEventListener('click', async function () {
-            submitInvoice.style.display = 'none';
-            submitInvoiceSend.style.display = 'inline-block';
+            }
+        }
+        // Handle edit_action_name select
+        function setEditActionName() {
+            if (edActionName) {
+                edActionName.innerHTML = '<option value="">Select Action</option>';
+                actionName.forEach(role => {
+                    edActionName.innerHTML += `<option value="${role.value}">${role.label}</option>`;
+                });
+            }
+        }
+        // Handle short_by_action_name select
+        function setShortByActionName() {
+            if (syAction) {
+                syAction.innerHTML = '<option value="">All Action</option>';
+                actionName.forEach(role => {
+                    syAction.innerHTML += `<option value="${role.value}">${role.label}</option>`;
+                });
+            }
+        }
+        // Jalankan semua fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function () {
+            setEditActionName();
+            setInputActionName();
+            setShortByActionName();
+        });
+    </script>
+    <script>
+        async function fetchModules() {
+            const response = await axios.get(`{{ route('app.users.modules.data') }}`);
+            const modules = response.data.data.map(module => ({
+                value: module.id.toString(),
+                label: module.module_label
+            }));
+            return modules;
+        }
+        // Handle input_module select
+        async function setInputModule() {
+            if (inModuleId) {
+                const modules = await fetchModules();
+                inModuleId.innerHTML = '<option value="">Select Module</option>';
+                modules.forEach(module => {
+                    inModuleId.innerHTML += `<option value="${module.value}">${module.label}</option>`;
+                });
+            }
+        }
+        // Handle edit_module select
+        async function setEditModule() {
+            if (edModuleId) {
+                const modules = await fetchModules();
+                edModuleId.innerHTML = '<option value="">Select Module</option>';
+                modules.forEach(module => {
+                    edModuleId.innerHTML += `<option value="${module.value}">${module.label}</option>`;
+                });
+            }
+        }
+        // Handle short_by_module select
+        async function setShortByModule() {
+            if (syModule) {
+                const modules = await fetchModules();
+                syModule.innerHTML = '<option value="">All Module</option>';
+                modules.forEach(module => {
+                    syModule.innerHTML += `<option value="${module.value}">${module.label}</option>`;
+                });
+            }
+        }
+        // Run all functions when the page loads
+        document.addEventListener('DOMContentLoaded', async function () {
+            await setEditModule();
+            await setInputModule();
+            await setShortByModule();
+        });
+    </script>
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    {{-- GET DATA --}}
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    <script>
+        async function fetchData(syVSearch, syVLimit, syVModule, syVAction) {
             try {
-                // Collect form data
-                const formData = new FormData();
-                const rowData = collectRowData();
-                // Append form fields
-                formData.append('inv_cus_name', inCusName.value);
-                formData.append('inv_cus_email', inCusEmail.value);
-                formData.append('inv_cus_phone', inCusPhone.value);
-                formData.append('inv_date', inDate.value);
-                formData.append('inv_date_jatuh_tempo', inDateJatuhTempo.value);
-                formData.append('invoice_items', JSON.stringify(rowData));
-                formData.append('img', inFiles.files[0]);
-                formData.append('_token', '{{ csrf_token() }}');
-                // Make API request using axios
-                const responseData = await axios.post(`{{ route('app.invoice.create') }}`, formData);
-                const response = responseData.data;
+                let url = `{{ route('app.users.modules.action.data') }}`;
+                let params = new URLSearchParams();
+
+                if (syVSearch && syVSearch.trim() !== '') {
+                    params.append('search', syVSearch.trim());
+                }
+                if (syVLimit != undefined && syVLimit != null && syVLimit != '') {
+                    params.append('limit', syVLimit);
+                }
+                if (syVModule && syVModule.trim() !== '') {
+                    params.append('module', syVModule.trim());
+                }
+                if (syVAction && syVAction.trim() !== '') {
+                    params.append('action', syVAction.trim());
+                }
+                // Hanya tambahkan parameter ke URL jika ada parameter
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
+                const response = await axios.get(url);
+                const data = response.data.data;
+
+                dataTable.innerHTML = '';
+                data.forEach(item => {
+                    dataTable.innerHTML += `
+                    <tr>
+                        <td class="ps-4">ID:${item.id}</td>
+                        <td>${item.module_label} | ${item.module_name}</td>
+                        <td>${item.action_name?item.action_name:''}</td>
+                        <td>${item.created_at?item.created_at:''}</td>
+                        <td>${item.updated_at?item.updated_at:''}</td>
+                        <td>
+                            <a href="#" data-id="${item.id}" class="btn_show_component_modal_form_edit"><i class="fa-regular fa-pen-to-square text-success"></i></a>
+                            <a href="#" data-id="${item.id}" class="btn_delete"><i class="fa-solid fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>
+                `;
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const syVSearch = sySearch.value;
+            const syVLimit = syLimit.value;
+            const syVModule = syModule.value;
+            const syVAction = syAction.value;
+            fetchData(syVSearch, syVLimit, syVModule, syVAction);
+        });
+        // GETDATA BY SEARCH
+        sySearch.addEventListener('keyup', (event) => {
+            const syVSearch = event.target.value.trim();
+            const syVLimit = syLimit.value;
+            const syVModule = syModule.value;
+            const syVAction = syAction.value;
+            fetchData(syVSearch, syVLimit, syVModule, syVAction);
+        });
+        // GETDATA BY LIMIT
+        syLimit.addEventListener('change', (event) => {
+            const syVSearch = sySearch.value;
+            const syVLimit = event.target.value.trim();
+            const syVModule = syModule.value;
+            const syVAction = syAction.value;
+            fetchData(syVSearch, syVLimit, syVModule, syVAction);
+        });
+        // GETDATA BY MODULE
+        syModule.addEventListener('change', (event) => {
+            const syVSearch = sySearch.value;
+            const syVLimit = syLimit.value;
+            const syVModule = event.target.value.trim();
+            const syVAction = syAction.value;
+            fetchData(syVSearch, syVLimit, syVModule, syVAction);
+        });
+        // GETDATA BY ACTION
+        syAction.addEventListener('change', (event) => {
+            const syVSearch = sySearch.value;
+            const syVLimit = syLimit.value;
+            const syVModule = syModule.value;
+            const syVAction = event.target.value.trim();
+            fetchData(syVSearch, syVLimit, syVModule, syVAction);
+        });
+    </script>
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    {{-- UPDATE DATA --}}
+    {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
+    <script>
+        document.addEventListener('click', async function (event) {
+            const buttonShowModalEdit = getShowModalEditButton(event.target);
+            if (buttonShowModalEdit) {
+                event.preventDefault();
+                const id = buttonShowModalEdit.dataset.id;
+                let url = `{{ route('app.users.modules.action.data') }}`;
+                let params = new URLSearchParams();
+                params.append('id', id);
+                // Hanya tambahkan parameter ke URL jika ada parameter
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
+                try {
+                    const response = await axios.get(url);
+                    const data = response.data.data;
+                    // Set values to form fields
+                    edId.value = data.id;
+                    edModuleId.value = data.module_id;
+                    edActionName.value = data.action_name;
+                    new bootstrap.Modal(componentModalFormEdit).show();
+
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            }
+        });
+        buttonUpdate.addEventListener('click', async function () {
+            buttonUpdate.style.display = 'none';
+            buttonUpdateSend.style.display = 'inline-block';
+            try {
+                const responseData = await axios.post(`{{ route('app.users.modules.action.update') }}`, {
+                    id: edId.value,
+                    module_id: edModuleId.value,
+                    action_name: edActionName.value,
+                });
+                let response = responseData.data;
                 if (response.status === true) {
                     alertResponseSuccess(response.message);
-                    window.location.href = "{{ route('app.invoice.view') }}";
+                    // refresh fetchData
+                    const syVSearch = sySearch.value;
+                    const syVLimit = syLimit.value;
+                    const syVModule = syModule.value;
+                    const syVAction = syAction.value;
+                    fetchData(syVSearch, syVLimit, syVModule, syVAction);
+                    // Close the modal
+                    bootstrap.Modal.getInstance(componentModalFormEdit).hide();
                 } else {
                     alertResponseError(response);
                 }
             } catch (error) {
-                console.error('Error saving invoice:', error);
+                console.error('Error saving data:', error);
             } finally {
-                submitInvoice.style.display = 'inline-block';
-                submitInvoiceSend.style.display = 'none';
+                buttonUpdate.style.display = 'inline-block';
+                buttonUpdateSend.style.display = 'none';
             }
         });
     </script>
