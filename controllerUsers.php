@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -33,9 +34,11 @@ class UsersController extends Controller
             $roles  = $request->input('roles');
             $limit  = $request->input('limit', 10);
 
-            $query = DB::table('users')->select('id', 'name', 'email', 'roles', 'provider', 'status', 'last_login', 'photo', 'created_at', 'updated_at')->orderBy('id', 'DESC');
+            $query = DB::table('users')
+                ->select('id', 'name', 'email', 'roles', 'provider', 'status', 'last_login', 'photo', 'created_at', 'updated_at')
+                ->orderBy('id', 'DESC');
 
-            # Prioritaskan pencarian berdasarkan ID dan Email jika keduanya ada
+            # Prioritize search by ID and Email if both exist
             if ($id && $email) {
                 $data = $query->where('id', $id)->where('email', $email)->first();
             } elseif ($id) {
@@ -43,29 +46,44 @@ class UsersController extends Controller
             } elseif ($email) {
                 $data = $query->where('email', $email)->first();
             } else {
-                # Filter berdasarkan parameter pencarian
+                # Apply search filters
                 if ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('name', 'like', "%$search%")->orWhere('email', 'like', "%$search%");
                     });
                 }
-                # Filter berdasarkan roles jika ada
+                # Filter by roles if provided
                 if ($roles) {
                     $query->where('roles', $roles);
                 }
-                # Filter berdasarkan status
+                # Filter by status
                 if ($status !== null) {
-                    if ($status === '') {
-                        # Tidak memfilter berdasarkan status
-                    } else {
+                    if ($status !== '') {
                         $query->where('status', $status);
                     }
                 }
                 $data = $query->limit($limit)->get();
             }
+
+            # Process data to add extra information
+            if ($data instanceof \Illuminate\Support\Collection) {
+                $data->transform(function ($item) {
+                    $item->last_login_relative = $item->last_login ? Carbon::parse($item->last_login)->diffForHumans() : 'Never logged in';
+                    $item->password_updated    = $item->created_at === $item->updated_at ? 'Never updated' : 'Updated';
+                    return $item;
+                });
+            } elseif ($data) {
+                // For single data found
+                $data = collect([$data])->transform(function ($item) {
+                    $item->last_login_relative = $item->last_login ? Carbon::parse($item->last_login)->diffForHumans() : 'Never logged in';
+                    $item->password_updated    = $item->created_at === $item->updated_at ? 'Never updated' : 'Updated';
+                    return $item;
+                })->first();
+            }
+
             return response()->json([
                 'status'  => true,
-                'message' => 'data users',
+                'message' => 'User data retrieved',
                 'count'   => $data instanceof \Illuminate\Support\Collection ? $data->count() : ($data ? 1 : 0),
                 'data'    => $data
             ]);
@@ -84,8 +102,8 @@ class UsersController extends Controller
             TelegramLogHelper::sendLogMessage($data);
             return response()->json([
                 'status'  => false,
-                'message' => 'Failed to view data',
-                'error'   => 'An internal error occurred. Check the log file: '
+                'message' => 'Error occurred',
+                'error'   => 'Internal error. Check logs.'
             ]);
         }
     }
@@ -121,7 +139,7 @@ class UsersController extends Controller
             if ($request->hasFile('photo')) {
                 $photoName = 'profile_' . now()->format('YmdHis') . '_' . bin2hex(random_bytes(8)) . '.' . $request->photo->getClientOriginalExtension();
                 $photoPath = $request->photo->storeAs('public', $photoName);
-                $photoUrl = url(Storage::url($photoPath));
+                $photoUrl  = url(Storage::url($photoPath));
             }
             DB::table('users')->insert([
                 'name'     => $request->name,
@@ -201,8 +219,8 @@ class UsersController extends Controller
             }
             // Update photo jika ada
             if ($request->hasFile('photo')) {
-                $photoName = 'profile_' . now()->format('YmdHis') . '_' . bin2hex(random_bytes(8)) . '.' . $request->photo->getClientOriginalExtension();
-                $photoPath = $request->photo->storeAs('public', $photoName);
+                $photoName           = 'profile_' . now()->format('YmdHis') . '_' . bin2hex(random_bytes(8)) . '.' . $request->photo->getClientOriginalExtension();
+                $photoPath           = $request->photo->storeAs('public', $photoName);
                 $updateData['photo'] = url(Storage::url($photoPath));
             }
             // Update data di database
@@ -996,7 +1014,7 @@ class UsersController extends Controller
             $status = $request->input('status');
             $roles  = $request->input('roles');
             $limit  = $request->input('limit', 10);
-            $query = DB::table('users')->select('id', 'name', 'email', 'roles', 'provider', 'status', 'last_login', 'created_at', 'updated_at')->orderBy('id', 'DESC');
+            $query  = DB::table('users')->select('id', 'name', 'email', 'roles', 'provider', 'status', 'last_login', 'created_at', 'updated_at')->orderBy('id', 'DESC');
             # Prioritaskan pencarian berdasarkan ID dan Email jika keduanya ada
             if ($id && $email) {
                 $data = $query->where('id', $id)->where('email', $email)->first();
