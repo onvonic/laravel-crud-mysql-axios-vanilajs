@@ -272,6 +272,52 @@
     {{-- SET DATA --}}
     {{-- -------------------------------------------------------------------------------------------------------------------------------------------------------- --}}
     <script>
+    // Data roles
+    async function getUserRoles() {
+        try {
+            const response = await axios.get(`{{ route('api.users.roles') }}`);
+            let dataroles = response.data.data;
+            // Handle edit_roles select
+            function setEditRoles() {
+                if (edRoles) {
+                    edRoles.innerHTML = '<option value="">Select Roles</option>';
+                    dataroles.forEach(role => {
+                        edRoles.innerHTML += `<option value="${role.name_roles}">${role.name_roles}</option>`;
+                    });
+                }
+            }
+            // Handle input_roles select
+            function setInputRoles() {
+                if (inRoles) {
+                    inRoles.innerHTML = '<option value="">Select Roles</option>';
+                    dataroles.forEach(role => {
+                        inRoles.innerHTML += `<option value="${role.name_roles}">${role.name_roles}</option>`;
+                    });
+                }
+            }
+            // Handle short_by_roles select
+            function setShortByRoles() {
+                if (syRoles) {
+                    syRoles.innerHTML = '<option value="">All Roles</option>';
+                    dataroles.forEach(role => {
+                        syRoles.innerHTML += `<option value="${role.name_roles}">${role.name_roles}</option>`;
+                    });
+                }
+            }
+            // Call all the functions
+            setEditRoles();
+            setInputRoles();
+            setShortByRoles();
+        } catch (error) {
+            console.error('Error fetching users roles:', error);
+        }
+    }
+    // Call when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        getUserRoles();
+    });
+</script>
+    <script>
         // Data action_name 
         const rolesName = [
             { value: 'admin', label: 'Admin' },
